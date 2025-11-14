@@ -16,3 +16,12 @@ type bexp =
   | Beq of bexp*bexp
   | Beqnat of aexp*aexp
 
+type instr =
+  | Skip of instr
+  | Assign of int * aexp
+  | Seq of instr * instr
+  | If of bexp * instr * instr
+  | While of bexp * instr
+
+type prog = instr
+type state = int list 
