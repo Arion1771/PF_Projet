@@ -1,3 +1,4 @@
+#use "anacomb.ml";;
 (*Exercice 1.1.1*)
 
 type aexp =
@@ -53,3 +54,27 @@ s1 ---------------> s3                             s1 ---------------> s2
 *)
 
 (*Exercice 2.1.1*)
+
+let p_var : (aexp, char) ranalist = 
+  terminal_res (fun c -> match c with
+    | 'a' -> Some (Ava 0)
+    | 'b' -> Some (Ava 1)
+    | 'c' -> Some (Ava 2)
+    | 'd' -> Some (Ava 3)
+    | _   -> None)
+
+let p_val : (aexp, char) ranalist = 
+  terminal_res (fun c -> match c with
+    | '0' -> Some (Aco 0)
+    | '1' -> Some (Aco 1)
+    | _   -> None)
+
+let p_expr : (aexp, char) ranalist = 
+  p_var -| p_val
+
+let p_instr :(aexp, char) ranalist =
+  terminal ( 's' ) -| ( )
+let p_prog_s :(aexp, char) ranalist =
+  terminal ( ';' ) --> ( )
+
+let p_prog :(aexp, char) ranalist =
