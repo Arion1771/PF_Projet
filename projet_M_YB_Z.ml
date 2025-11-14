@@ -1,18 +1,18 @@
 (*Exercice 1.1.1*)
 
-type Aexp =
+type aexp =
   | Aco of int
   | Ava of int
-  | Amu of Aexp * Aexp
-  | Apl of Aexp * Aexp
-  | Amo of Aexp * Aexp
+  | Amu of aexp * aexp
+  | Apl of aexp * aexp
+  | Amo of aexp * aexp
 
-type Bexp =
-  | Btrue of Bexp
-  | Bfalse of Bexp
-  | Bnot of Bexp -> Bexp
-  | Band of Bexp -> Bexp -> Bexp
-  | Bor of Bexp -> Bexp -> Bexp
-  | Beq of Bexp -> Bexp -> Bexp
-  | Beqnat of Aexp -> Aexp -> Bexp
+type bexp =
+  | Btrue of bexp
+  | Bfalse of bexp
+  | Bnot of bexp
+  | Band of bexp*bexp
+  | Bor of bexp*bexp
+  | Beq of bexp*bexp
+  | Beqnat of aexp*aexp
 
