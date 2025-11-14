@@ -3,18 +3,12 @@
 type aexp =
   | Aco of int
   | Ava of int
-  | Amu of aexp * aexp
-  | Apl of aexp * aexp
-  | Amo of aexp * aexp
+
 
 type bexp =
   | Btrue of bexp
   | Bfalse of bexp
   | Bnot of bexp
-  | Band of bexp*bexp
-  | Bor of bexp*bexp
-  | Beq of bexp*bexp
-  | Beqnat of aexp*aexp
 
 type instr =
   | Skip of instr
@@ -24,4 +18,21 @@ type instr =
   | While of bexp * instr
 
 type prog = instr
-type state = int list 
+type state = int list
+
+
+(*
+
+<Programme> ::= <Instruction> <ProgrammeSuite>
+
+<ProgrammeSuite> ::= ";" <Instruction> <ProgrammeSuite> | ε
+
+<Instruction> ::= "s"
+                | <Variable> ":=" <Valeur>
+                | "i" "(" <Variable> ")" "{" <Programme> "}" "{" <Programme> "}"
+                | "w" "(" <Variable> ")" "{" <Programme> "}"
+
+<Variable> ::= "a" | "b" | "c" | "d"
+<Valeur> ::= "0" | "1" | <Variable> | <Expression>
+
+*)
