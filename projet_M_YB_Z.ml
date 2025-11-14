@@ -21,7 +21,7 @@ type prog = instr
 type state = int list
 
 
-(*
+(*Exercice 1.1.2
 
 <Programme> ::= <Instruction> <ProgrammeSuite>
 
@@ -29,10 +29,11 @@ type state = int list
 
 <Instruction> ::= "s"
                 | <Variable> ":=" <Valeur>
-                | "i" "(" <Variable> ")" "{" <Programme> "}" "{" <Programme> "}"
-                | "w" "(" <Variable> ")" "{" <Programme> "}"
+                | "i" "(" <Expression> ")" "{" <Programme> "}" "{" <Programme> "}"
+                | "w" "(" <Expression> ")" "{" <Programme> "}"
 
 <Variable> ::= "a" | "b" | "c" | "d"
-<Valeur> ::= "0" | "1" | <Variable> | <Expression>
+<Valeur> ::= "0" | "1" | 
+<Expression> ::= <Variable> | <Valeur> 
 
 *)
