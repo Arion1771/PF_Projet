@@ -40,8 +40,11 @@ type state = int list
 
 (*Exercice 1.1.4*)
 
-(*Exercice 1.2.1
 
+
+
+(*Exercice 1.2.1*)
+(*
   [[expr]]s1 = false                                [[expr]]s1 = true                        
 -----------------------                            -----------------------   
         else Q                                             then P
@@ -49,5 +52,4 @@ s1 ---------------> s3                             s1 ---------------> s2
 
 *)
 
-(*Exercice 1.2.2*)
-
+(*Exercice 2.1.1*)
