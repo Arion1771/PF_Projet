@@ -5,7 +5,6 @@ type aexp =
   | Aco of int
   | Ava of int
 
-
 type bexp =
   | Btrue of bexp
   | Bfalse of bexp
@@ -13,7 +12,7 @@ type bexp =
 
 type instr =
   | Skip of instr
-  | Assign of int * aexp
+  | Assign of aexp * aexp
   | Seq of instr * instr
   | If of bexp * instr * instr
   | While of bexp * instr
@@ -78,11 +77,20 @@ let p_instr :(instr, char) ranalist =
   +| p_assign
   +| espilon_res
 
+
+let p_assign : (instr, char) ranalist =
+  p_var ++> fun i ->
+  terminal ':' -->
+  terminal '=' -+>
+  (p_expr ++> fun e ->
+      epsilon_res (Assign(i, e)))
+
+
 let p_if :(instr, char) ranalist =
 
 let p_while :(instr, char) ranalist =
+                    
 
-let p_assign :(instr, char) ranalist =
 
 let rec p_prog_s :(instr, char) ranalist =
   terminal_res ( ';' ) ++> p_instr ++> p_prog_s
@@ -90,6 +98,4 @@ let rec p_prog_s :(instr, char) ranalist =
 
 let p_prog :(prog, char) ranalist =
   p_instr ++> p_prog_s
-
-let test = p_assign ['a';":";"=";'3']
 
