@@ -97,9 +97,9 @@ and p_instr :(instr, char) ranalist =
   +| epsilon_res(Skip)
 
 and p_while : (instr, char) ranalist =
-  terminal ('w') --> terminal ('(') -+> p_expr ++> fun cond -> terminal (')') -->
-  terminal ('{') -+> p_prog ++> fun ins -> terminal ('}') ++>
-  epsilon_res (While (cond, ins))
+  terminal 'w' --> terminal '(' -+> p_expr ++> fun cond -> terminal ')' -->
+  terminal '{' -+> p_prog ++> fun body -> terminal '}' ++>
+  epsilon_res (While (cond, body))
 
 and p_if :(instr, char) ranalist =
   terminal ('i') --> terminal ('(') -+> p_expr ++> fun cond -> terminal (')') -->
