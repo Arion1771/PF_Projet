@@ -72,17 +72,24 @@ let p_val : (aexp, char) ranalist =
 let p_expr : (aexp, char) ranalist = 
   p_var +| p_val
   
-let p_instr :(aexp, char) ranalist =
-   terminal ('i') ++> terminal ('(') ++> p_expr ++> terminal (')') ++>terminal ('{') ++> p_prog ++> terminal ('}')
-  +| terminal ('w') ++> terminal ('(') ++> p_expr ++> terminal (')') ++>terminal ('{') ++> p_prog ++> terminal ('}')
-  +| p_var ++> terminal (':') ++> terminal ('=') ++> p_expr
-  +| epsilon_res()
+let p_instr :(instr, char) ranalist =
+   p_if
+  +| p_while
+  +| p_assign
+  +| espilon_res
 
-let rec p_prog_s :(aexp, char) ranalist =
-  terminal ( ';' ) ++> p_instr ++> p_prog_s
-  +|  terminal ( ';' ) ++> epsilon_res
+let p_if :(instr, char) ranalist =
 
-let test = p_expr ['a';'3']
+let p_while :(instr, char) ranalist =
 
+let p_assign :(instr, char) ranalist =
 
-let p_prog :(aexp, char) ranalist =
+let rec p_prog_s :(instr, char) ranalist =
+  terminal_res ( ';' ) ++> p_instr ++> p_prog_s
+  +|  terminal_res ( ';' ) ++> epsilon_res
+
+let p_prog :(prog, char) ranalist =
+  p_instr ++> p_prog_s
+
+let test = p_assign ['a';":";"=";'3']
+
