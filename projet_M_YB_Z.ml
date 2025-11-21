@@ -81,7 +81,11 @@ let p_instr :(instr, char) ranalist =
 let p_if :(instr, char) ranalist =
 
 let p_while :(instr, char) ranalist =
-
+  terminal_res ( 'w' ) ++> terminal_res ( '(' ) ++> p_expr ++> 
+  terminal_res ( ')' ) ++> 
+  terminal_res ( '{' ) ++> 
+  p_prog ++> 
+  terminal_res ( '}' ) ++> 
 let p_assign :(instr, char) ranalist =
 
 let rec p_prog_s :(instr, char) ranalist =
