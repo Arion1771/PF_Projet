@@ -73,13 +73,12 @@ let p_expr : (aexp, char) ranalist =
   p_var -| p_val
 
 let p_instr :(aexp, char) ranalist =
-  
    terminal ('i') ++> terminal ('(') ++> p_expr ++> terminal (')') ++>terminal ('{') --> p_prog --> terminal ('}')
-  -| terminal ('w') --> terminal ('(') --> p_expr --> terminal (')') -->terminal ('{') --> p_prog --> terminal ('}')
-  -| p_var --> terminal (':') --> terminal ('=') --> p_expr
-  -| epsilon_res()
+  +| terminal ('w') ++> terminal ('(') ++> p_expr ++> terminal (')') ++>terminal ('{') ++> p_prog ++> terminal ('}')
+  +| p_var ++> terminal (':') ++> terminal ('=') ++> p_expr
+  +| epsilon_res()
 
 let p_prog_s :(aexp, char) ranalist =
-  terminal ( ';' ) --> ( )
+  terminal ( ';' ) ++> ( )
 
 let p_prog :(aexp, char) ranalist =
