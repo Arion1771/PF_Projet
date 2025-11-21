@@ -72,7 +72,7 @@ let p_expr : (aexp, char) ranalist =
   p_var +| p_val
   
 let p_skip : (instr, char) ranalist =
-  epsilon_res ()
+  epsilon_res (Skip)
 
 let p_assign : (instr, char) ranalist =
   p_var ++> fun i ->
@@ -82,13 +82,13 @@ let p_assign : (instr, char) ranalist =
       epsilon_res (Assign(i, e)))
 
 let rec p_prog_s :(instr, char) ranalist =
-  terminal_res (fun c -> if c = ';' then Some () else None) ++> p_instr ++> p_prog_s
-  +|  terminal_res (fun c -> if c = ';' then Some () else None) ++> epsilon_res 
+  (terminal_res (fun c -> if c = ';' then Some () else None)) ++>
+  (fun _ -> p_instr ++> (fun i ->  p_prog_s ++> (fun rest -> epsilon_res (Seq (i, rest))))) +| epsilon_res Skip
 
 and p_prog :(instr, char) ranalist =
   p_instr ++> (fun i -> p_prog_s ++> (fun s -> match s with
       | Skip -> epsilon_res i
-      | _    -> epsilon_res (Seq (i, s))))
+      | _    -> epsilon_res (Seq i s)))
 
 and p_instr :(instr, char) ranalist =
    p_if
@@ -112,6 +112,10 @@ and p_while : (instr, char) ranalist =
   )))))))
 
 and p_if :(instr, char) ranalist =
+  terminal ('i') --> terminal ('(') -+> p_expr ++> fun cond -> terminal (')') -->
+  terminal ('{') -+> p_prog ++> fun i1 -> terminal ('}') ++>
+  terminal ('{') -+> p_prog ++> fun i2 -> terminal ('}') ++>
+  epsilon_res (If (cond, i1, i2))
 
   
 let test_assign = p_assign ['a';":";"=";'3']
