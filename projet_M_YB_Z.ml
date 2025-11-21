@@ -98,8 +98,8 @@ and p_instr :(instr, char) ranalist =
 
 and p_while : (instr, char) ranalist =
   terminal ('w') --> terminal ('(') -+> p_expr ++> fun cond -> terminal (')') -->
-  terminal ('{') -+> p_prog ++> fun i1 -> terminal ('}') ++>
-  epsilon_res (While (cond, i1))
+  terminal ('{') -+> p_prog ++> fun ins -> terminal ('}') ++>
+  epsilon_res (While (cond, ins))
 
 and p_if :(instr, char) ranalist =
   terminal ('i') --> terminal ('(') -+> p_expr ++> fun cond -> terminal (')') -->
