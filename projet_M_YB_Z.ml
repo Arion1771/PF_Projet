@@ -61,24 +61,28 @@ let p_var : (aexp, char) ranalist =
     | 'b' -> Some (Ava 1)
     | 'c' -> Some (Ava 2)
     | 'd' -> Some (Ava 3)
-    | _   -> None)
+    |  _  -> None)
 
 let p_val : (aexp, char) ranalist = 
   terminal_res (fun c -> match c with
     | '0' -> Some (Aco 0)
     | '1' -> Some (Aco 1)
-    | _   -> None)
+    |  _  -> None)
 
 let p_expr : (aexp, char) ranalist = 
-  p_var -| p_val
-
+  p_var +| p_val
+  
 let p_instr :(aexp, char) ranalist =
-   terminal ('i') ++> terminal ('(') ++> p_expr ++> terminal (')') ++>terminal ('{') --> p_prog --> terminal ('}')
+   terminal ('i') ++> terminal ('(') ++> p_expr ++> terminal (')') ++>terminal ('{') ++> p_prog ++> terminal ('}')
   +| terminal ('w') ++> terminal ('(') ++> p_expr ++> terminal (')') ++>terminal ('{') ++> p_prog ++> terminal ('}')
   +| p_var ++> terminal (':') ++> terminal ('=') ++> p_expr
   +| epsilon_res()
 
-let p_prog_s :(aexp, char) ranalist =
-  terminal ( ';' ) ++> ( )
+let rec p_prog_s :(aexp, char) ranalist =
+  terminal ( ';' ) ++> p_instr ++> p_prog_s
+  +|  terminal ( ';' ) ++> epsilon_res
+
+let test = p_expr ['a';'3']
+
 
 let p_prog :(aexp, char) ranalist =
