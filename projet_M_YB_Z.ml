@@ -12,7 +12,7 @@ type bexp =
   | Bnot of bexp
 
 type instr =
-  | Skip of instr
+  | Skip 
   | Assign of aexp * aexp
   | Seq of instr * instr
   | If of bexp * instr * instr
@@ -101,7 +101,7 @@ let p_assign : (instr, char) ranalist =
       epsilon_res (Assign(i, e)))
 
 let rec p_prog_s :(instr, char) ranalist =
-   terminal ( ';' ) -+> p_instr ++> fun i -> let seq= Seq(seq, i2) in p_prog_s seq 
+   terminal ( ';' ) -+> p_instr ++> fun i -> p_prog_s ++> fun reste -> epsilon_res(Seq (i,reste))
    +| epsilon_res(Skip)
 and
 p_instr : (instr, char) ranalist =
