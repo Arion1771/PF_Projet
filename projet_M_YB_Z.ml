@@ -13,7 +13,7 @@ type bexp =
 
 type instr =
   | Skip of instr
-  | Assign of int * aexp
+  | Assign of aexp * aexp
   | Seq of instr * instr
   | If of bexp * instr * instr
   | While of bexp * instr
@@ -72,24 +72,68 @@ let p_val : (aexp, char) ranalist =
 let p_expr : (aexp, char) ranalist = 
   p_var +| p_val
   
-let p_instr :(instr, char) ranalist =
-   p_if
+let p_instr : (instr, char) ranalist =
+      p_if
   +| p_while
   +| p_assign
-  +| espilon_res
+  +| p_skip 
+
+
+let p_skip : (instr,char) ranalist =
+  epsilon_res (Skip)
 
 let p_if :(instr, char) ranalist =
-
-let p_while :(instr, char) ranalist =
-
-let p_assign :(instr, char) ranalist =
-
-let rec p_prog_s :(instr, char) ranalist =
-  terminal_res ( ';' ) ++> p_instr ++> p_prog_s
-  +|  terminal_res ( ';' ) ++> epsilon_res
+  terminal ('i') --> terminal ('(') -+> p_expr ++> fun cond -> terminal (')') -->
+  terminal ('{') -+> p_prog ++> fun i1 -> terminal ('}') ++>
+  terminal ('{') -+> p_prog ++> fun i2 -> terminal ('}') ++>
+  epsilon_res (If (cond, i1, i2))
 
 let p_prog :(prog, char) ranalist =
-  p_instr ++> p_prog_s
+  p_instr ++> fun i1 -> p_prog_s i1 ++> fun is -> epsilon_res (Seq (i1, is))
+  
+let p_while :(instr, char) ranalist =
+
+let p_assign : (instr, char) ranalist =
+  p_var ++> fun i ->
+  terminal ':' -->
+  terminal '=' -+>
+  (p_expr ++> fun e ->
+      epsilon_res (Assign(i, e)))
+
+let rec p_prog_s :(instr, char) ranalist =
+   terminal ( ';' ) -+> p_instr ++> fun i -> let seq= Seq(seq, i2) in p_prog_s seq 
+   +| epsilon_res(Skip)
+and
+p_instr : (instr, char) ranalist =
+      p_if
+  +| p_while
+  +| p_assign
+  +| p_skip 
+and 
+p_if :(instr, char) ranalist =
+  terminal ('i') --> terminal ('(') -+> p_expr ++> fun cond -> terminal (')') -->
+  terminal ('{') -+> p_prog ++> fun i1 -> terminal ('}') ++>
+  terminal ('{') -+> p_prog ++> fun i2 -> terminal ('}') ++>
+  epsilon_res (If (cond, i1, i2))
+and 
+p_while : (instr, char) ranalist =
+  (terminal_res (fun c -> if c = 'w' then Some () else None)) ++>
+  (fun _ -> (terminal_res (fun c -> if c = '(' then Some () else None)) ++>
+  (fun _ -> p_expr ++>  (fun cond ->
+  (terminal_res (fun c -> if c = ')' then Some () else None)) ++>
+  (fun _ ->
+  (terminal_res (fun c -> if c = '{' then Some () else None)) ++>
+  (fun _ ->
+  p_prog ++>
+  (fun body ->
+  (terminal_res (fun c -> if c = '}' then Some () else None)) ++>
+  (fun _ ->
+      epsilon_res (While (cond, body))
+  )))))))
+
+
+let p_prog :(prog, char) ranalist =
+  p_instr ++> fun i1 -> p_prog_s i1 ++> fun is -> epsilon_res (Seq (i1,is))
 
 let test = p_assign ['a';":";"=";'3']
 
