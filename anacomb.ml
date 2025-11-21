@@ -73,6 +73,9 @@ let (++>) (a1 : ('resa, 'term) ranalist) (a2 : 'resa -> ('resb, 'term) ranalist)
   fun l -> let (x, l) = a1 l in a2 x l
 
 (* a1 rendant un résultat suivi de a2 sans résultat est peu utile *)
+let (+->) (a1 : ('res, 'term) ranalist) (a2 : 'term analist):
+      ('resb, 'term) ranalist =
+  fun l -> let (x, l) = a1 l in x a2 l
 
 (* Choix entre a1 ou a2 informatifs *)
 let (+|) (a1 : ('res, 'term) ranalist) (a2 : ('res, 'term) ranalist) :
