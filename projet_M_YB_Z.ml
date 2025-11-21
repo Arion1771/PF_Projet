@@ -85,6 +85,7 @@ let p_assign : (instr, char) ranalist =
   (p_expr ++> fun e ->
       epsilon_res (Assign(i, e)))
 
+let test = p_assign ['c';':';'=';'1']
 
 let p_if :(instr, char) ranalist =
 
