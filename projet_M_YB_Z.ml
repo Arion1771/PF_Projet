@@ -12,8 +12,6 @@ type bexp =
 
 type instr =
   | Skip
-  | Assign of int * aexp
-  | Skip of instr
   | Assign of aexp * aexp
   | Seq of instr * instr
   | If of bexp * instr * instr
@@ -74,7 +72,7 @@ let p_expr : (aexp, char) ranalist =
   p_var +| p_val
   
 let p_skip : (instr, char) ranalist =
-  terminal_res (fun c -> if c = 's' then Some Skip else None)
+  epsilon_res ()
 
 let p_assign : (instr, char) ranalist =
   p_var ++> fun i ->
@@ -83,17 +81,21 @@ let p_assign : (instr, char) ranalist =
   (p_expr ++> fun e ->
       epsilon_res (Assign(i, e)))
 
-
 let rec p_prog_s :(instr, char) ranalist =
   terminal_res (fun c -> if c = ';' then Some () else None) ++> p_instr ++> p_prog_s
-  +|  terminal_res (fun c -> if c = ' ' then Some () else None) ++> epsilon_res 
-and p_prog :(prog, char) ranalist =
-  p_instr ++> p_prog_s
+  +|  terminal_res (fun c -> if c = ';' then Some () else None) ++> epsilon_res 
+
+and p_prog :(instr, char) ranalist =
+  p_instr ++> (fun i -> p_prog_s ++> (fun s -> match s with
+      | Skip -> epsilon_res i
+      | _    -> epsilon_res (Seq (i, s))))
+
 and p_instr :(instr, char) ranalist =
    p_if
   +| p_while
   +| p_assign
-  +| espilon_res
+  +| epsilon_res
+
 and p_while : (instr, char) ranalist =
   (terminal_res (fun c -> if c = 'w' then Some () else None)) ++>
   (fun _ -> (terminal_res (fun c -> if c = '(' then Some () else None)) ++>
@@ -109,18 +111,8 @@ and p_while : (instr, char) ranalist =
       epsilon_res (While (cond, body))
   )))))))
 
-let p_if :(instr, char) ranalist =
+and p_if :(instr, char) ranalist =
 
-let rec p_prog_s :(instr, char) ranalist =
-  terminal_res (fun c -> if c = ';' then Some () else None) ++> p_instr ++> p_prog_s
-  +|  terminal_res (fun c -> if c = ' ' then Some () else None) ++> epsilon_res 
-and p_prog :(prog, char) ranalist =
   
-and p_instr :(instr, char) ranalist =
-   p_if
-  +| p_while
-  +| p_assign
-  +| epsilon_res
-
 let test_assign = p_assign ['a';":";"=";'3']
 
