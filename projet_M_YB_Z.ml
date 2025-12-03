@@ -174,7 +174,15 @@ type bexp =
 let p_final : (bexp, char) ranalist =
   (terminal '!' -+> p_final ++> fun f -> epsilon_res (Bnot f))
   +| ()
-
+and p_conj : (bexp, char) ranalist =
+  p_final ++> fun f1 ->
+  p_conj_s f1
+and p_conj_s (acc : bexp) : (bexp, char) ranalist =
+  ( terminal '.' -+> p_final ++> fun f2 ->
+    let acc' = Bconj (acc, f2) in
+    p_conj_s acc')
+  +| epsilon_res (acc)
+  
 (*Exercice 2.2.1*)
 
 type state = int list
