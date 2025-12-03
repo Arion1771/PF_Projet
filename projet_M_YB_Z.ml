@@ -125,7 +125,7 @@
 
   (*Exercice 2.1.2*)
 
-  let string_of_aexp = function
+  let rec string_of_aexp = function
     | Aco n -> "Aco " ^ string_of_int n
     | Ava n -> "Ava " ^ string_of_int n
     | Bnot e ->
@@ -191,6 +191,16 @@
   ignore (test_aexp "!a.b+0");
   ignore (test_aexp "(a+b).c");
   ignore (test_aexp "!(a+b).c");
+  ignore (test_aexp "!(a.b+!(c.d))");
+  ignore (test_aexp "!!a");
+  ignore (test_aexp "a+b.c+d.e");
+  ignore (test_aexp "((a))");
+  ignore (test_aexp "!!!!!!!!!!!!!!!!!!!!!!a");
+  ignore (test_aexp "(a))");
+  ignore (test_aexp "(a");
+
+  ()
+
 
   (*Exercice 2.1.3*)
 
