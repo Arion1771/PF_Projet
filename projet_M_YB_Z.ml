@@ -5,12 +5,6 @@ type aexp =
   | Aco of int
   | Ava of int
 
-
-type bexp =
-  | Btrue of bexp
-  | Bfalse of bexp
-  | Bnot of bexp
-
 type instr =
   | Skip 
   | Assign of aexp * aexp
@@ -40,10 +34,17 @@ type state = int list
 *)
 
 (*Exercice 1.1.4*)
+(* 
+<Valeur> ::= "0" | "1" | 
+<Variable> ::= "a" | "b" | "c" | "d"
+<Expression> ::= <Variable> | <Valeur> 
+<Disjonction> ::= <Conjonction> <DisjonctionSuite>
+<DisjonctionSuite> ::= "+" <Conjonction> <DisjonctionSuite> | ε
+<Conjonction> ::= <Final> <ConjonctionSuite>
+<ConjonctionSuite> ::= "." <Final> <ConjonctionSuite> | ε
+<Final> ::= "!" <Final> | <Expression> | "(" <Disjonction> ")"
 
-
-
-
+*)
 (*Exercice 1.2.1*)
 (*
   [[expr]]s1 = false                                [[expr]]s1 = true                        
@@ -76,10 +77,6 @@ let p_expr : (aexp, char) ranalist =
 
 let p_skip : (instr,char) ranalist =
   epsilon_res (Skip)
-
-
-
-
 
 let p_assign : (instr, char) ranalist =
   p_var ++> fun i ->
@@ -134,6 +131,7 @@ fun l ->
       epsilon_res (While (cond, body))
   )))))))) l
 
+(*Exercice 2.1.2*)
 
 let string_of_aexp = function
   | Aco n -> "Aco " ^ string_of_int n
@@ -162,6 +160,21 @@ let _ =show_ast "a:=0"
 let _=  show_ast "a:=0;b:=1"
 let _=  show_ast "w(a){a:=1}"
 let _=  show_ast "i(a){a:=0}{b:=1}"
-  
+let _=  show_ast ";"
+let _= show_ast "a:=1;b:=1;c:=1;w(a){i(c){c:=0;a:=b}{b:=0;c:=a}}"
+
+(*Exercice 2.1.3*)
+
+type bexp =
+  | Bnot of aexp
+  | Bconj of bexp * bexp
+  | Bdisj of bexp * bexp
 
 
+let p_final : (bexp, char) ranalist =
+  (terminal '!' -+> p_final ++> fun f -> epsilon_res (Bnot f))
+  +| ()
+
+(*Exercice 2.2.1*)
+
+type state = int list
