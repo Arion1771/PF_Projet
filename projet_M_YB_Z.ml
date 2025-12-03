@@ -72,8 +72,6 @@ let p_val : (aexp, char) ranalist =
 
 let p_expr : (aexp, char) ranalist = 
   p_var +| p_val
-  
-
 
 let p_skip : (instr,char) ranalist =
   epsilon_res (Skip)
@@ -90,7 +88,6 @@ let rec p_prog : (instr, char) ranalist =
   fun l ->
     (p_instr ++> fun i1 ->
      p_prog_s i1) l
-
 and p_prog_s (acc : instr) : (instr, char) ranalist =
   fun l ->
     ( (terminal ';' -+> p_instr ++> fun i2 ->
@@ -99,7 +96,6 @@ and p_prog_s (acc : instr) : (instr, char) ranalist =
       +|
       epsilon_res acc
     ) l
-
 and p_instr : (instr, char) ranalist =
   fun l ->
     (     p_if
@@ -107,29 +103,22 @@ and p_instr : (instr, char) ranalist =
       +|  p_assign
       +|  p_skip
     ) l
-and 
-p_if :(instr, char) ranalist =
-fun l ->
-  (terminal ('i') --> terminal ('(') -+> p_expr ++> fun cond -> terminal (')') -->
-  terminal ('{') -+> p_prog ++> fun i1 -> terminal ('}') -->
-  terminal ('{') -+> p_prog ++> fun i2 -> terminal ('}') -+>
-  epsilon_res (If (cond, i1, i2))) l
-and 
-p_while : (instr, char) ranalist =
-fun l ->
-  ((terminal_res (fun c -> if c = 'w' then Some () else None)) ++>
-  (fun _ -> (terminal_res (fun c -> if c = '(' then Some () else None)) ++>
-  (fun _ -> p_expr ++>  (fun cond ->
-  (terminal_res (fun c -> if c = ')' then Some () else None)) ++>
-  (fun _ ->
-  (terminal_res (fun c -> if c = '{' then Some () else None)) ++>
-  (fun _ ->
-  p_prog ++>
-  (fun body ->
-  (terminal_res (fun c -> if c = '}' then Some () else None)) ++>
-  (fun _ ->
-      epsilon_res (While (cond, body))
-  )))))))) l
+and p_if :(instr, char) ranalist =
+  fun l ->
+    (terminal ('i') --> terminal ('(') -+> p_expr ++> fun cond -> terminal (')') -->
+    terminal ('{') -+> p_prog ++> fun i1 -> terminal ('}') -->
+    terminal ('{') -+> p_prog ++> fun i2 -> terminal ('}') -+>
+    epsilon_res (If (cond, i1, i2))) l
+and p_while : (instr, char) ranalist =
+  fun l ->
+    ((terminal_res (fun c -> if c = 'w' then Some () else None)) ++>
+    (fun _ -> (terminal_res (fun c -> if c = '(' then Some () else None)) ++>
+    (fun _ -> p_expr ++>  (fun cond -> (terminal_res (fun c -> if c = ')' then Some () else None)) ++>
+    (fun _ -> (terminal_res (fun c -> if c = '{' then Some () else None)) ++>
+    (fun _ -> p_prog ++>
+    (fun body -> (terminal_res (fun c -> if c = '}' then Some () else None)) ++>
+    (fun _ -> epsilon_res (While (cond, body)))))))))
+  ) l
 
 (*Exercice 2.1.2*)
 
@@ -173,7 +162,20 @@ type bexp =
 
 let p_final : (bexp, char) ranalist =
   (terminal '!' -+> p_final ++> fun f -> epsilon_res (Bnot f))
-  +| ()
+  +| (p_expr ++> fun e -> epsilon_res (e))
+  +| (terminal '(' --> p_disj ++> fun d -> terminal ')' -+> epsilon_res d)
+and p_disj : (bexp, char) ranalist =
+  fun l ->
+    (p_conj ++> fun c1 ->
+     p_disj_s c1) l
+and p_disj_s: (bexp, char) ranalist =
+  fun l ->
+    ( (terminal '+' -+> p_conj ++> fun c2 ->
+        let c = Bdisj (c1, c2) in
+        p_disj_s c)
+      +|
+      epsilon_res c1
+    ) l
 
 (*Exercice 2.2.1*)
 
