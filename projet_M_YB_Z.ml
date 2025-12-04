@@ -54,173 +54,7 @@ s1 ---------------> s3                             s1 ---------------> s2
 
 *)
 
-(*Exercice 2.1.1*)
-
-let p_var : (aexp, char) ranalist = 
-  terminal_res (fun c -> match c with
-    | 'a' -> Some (Ava 0)
-    | 'b' -> Some (Ava 1)
-    | 'c' -> Some (Ava 2)
-    | 'd' -> Some (Ava 3)
-    |  _  -> None)
-
-let p_val : (aexp, char) ranalist = 
-  terminal_res (fun c -> match c with
-    | '0' -> Some (Aco 0)
-    | '1' -> Some (Aco 1)
-    |  _  -> None)
-
-let p_expr : (aexp, char) ranalist = 
-  p_var +| p_val
-  
-
-
-let p_skip : (instr,char) ranalist =
-  epsilon_res (Skip)
-
-let p_assign : (instr, char) ranalist =
-  p_var ++> fun i ->
-  terminal ':' -->
-  terminal '=' -+>
-  (p_expr ++> fun e ->
-      epsilon_res (Assign(i, e)))
-
-
-let rec p_prog : (instr, char) ranalist =
-  fun l ->
-    (p_instr ++> fun i1 ->
-     p_prog_s i1) l
-
-and p_prog_s (acc : instr) : (instr, char) ranalist =
-  fun l ->
-    ( (terminal ';' -+> p_instr ++> fun i2 ->
-        let acc' = Seq (acc, i2) in
-        p_prog_s acc')
-      +|
-      epsilon_res acc
-    ) l
-
-and p_instr : (instr, char) ranalist =
-  fun l ->
-    (     p_if
-      +|  p_while
-      +|  p_assign
-      +|  p_skip
-    ) l
-and 
-p_if :(instr, char) ranalist =
-fun l ->
-  (terminal ('i') --> terminal ('(') -+> p_expr ++> fun cond -> terminal (')') -->
-  terminal ('{') -+> p_prog ++> fun i1 -> terminal ('}') -->
-  terminal ('{') -+> p_prog ++> fun i2 -> terminal ('}') -+>
-  epsilon_res (If (cond, i1, i2))) l
-and 
-p_while : (instr, char) ranalist =
-fun l ->
-  ((terminal_res (fun c -> if c = 'w' then Some () else None)) ++>
-  (fun _ -> (terminal_res (fun c -> if c = '(' then Some () else None)) ++>
-  (fun _ -> p_expr ++>  (fun cond ->
-  (terminal_res (fun c -> if c = ')' then Some () else None)) ++>
-  (fun _ ->
-  (terminal_res (fun c -> if c = '{' then Some () else None)) ++>
-  (fun _ ->
-  p_prog ++>
-  (fun body ->
-  (terminal_res (fun c -> if c = '}' then Some () else None)) ++>
-  (fun _ ->
-      epsilon_res (While (cond, body))
-  )))))))) l
-
-(*Exercice 2.1.2*)
-
-let string_of_aexp = function
-  | Aco n -> "Aco " ^ string_of_int n
-  | Ava n -> "Ava " ^ string_of_int n
-
-let rec string_of_instr = function
-  | Skip ->
-      "Skip"
-  | Assign (v, e) ->
-      "Assign (" ^ string_of_aexp v ^ ", " ^ string_of_aexp e ^ ")"
-  | Seq (i1, i2) ->
-      "Seq (" ^ string_of_instr i1 ^ ", " ^ string_of_instr i2 ^ ")"
-  | If (cond, i1, i2) ->
-      "If (" ^ string_of_aexp cond ^ ", "
-             ^ string_of_instr i1 ^ ", "
-             ^ string_of_instr i2 ^ ")"
-  | While (cond, body) ->
-      "While (" ^ string_of_aexp cond ^ ", "
-                ^ string_of_instr body ^ ")"
-
-let show_ast s =
-  let (ast, _) = p_prog (list_of_string s) in
-  print_endline (string_of_instr ast)
-
-let _ =show_ast "a:=0"
-let _=  show_ast "a:=0;b:=1"
-let _=  show_ast "w(a){a:=1}"
-let _=  show_ast "i(a){a:=0}{b:=1}"
-let _=  show_ast ";"
-let _= show_ast "a:=1;b:=1;c:=1;w(a){i(c){c:=0;a:=b}{b:=0;c:=a}}"
-    
-(*Exrmple du cours*)
-let _= show_ast "a:=1;b:=1;c:=1;w(a){i(c){c:=0;a:=b}{b:=0;c:=a}}"
-  
-(* Imbrication : While dans un If *)
-let _ = show_ast "i(a){w(b){a:=1}}{b:=0}"
-
-(* Imbrication : Séquence à l'intérieur d'un bloc *)
-let _ = show_ast "w(a){a:=0;b:=1;c:=0}"
-
-(* Double imbrication : If dans While dans If *)
-let _ = show_ast "i(a){w(b){i(c){a:=0}{a:=1}}}{d:=0}"
-
-(* Bloc vide *)
-(* Théorie : While(a, Skip). *)
-let _ = show_ast "w(a){}" 
-
-(* Point-virgule traînant *)
-(* Théorie : Seq(a:=0, Skip) *)
-let _ = show_ast "a:=0;"
-
-(* Test 2.3 : Double point-virgule *)
-(* Théorie : Devrait donner Seq((Assign, Skip), Assign *)
-let _ = show_ast "a:=0;;b:=1"
-
-(* Espaces dans l'assignation *)
-(* Si ça marche, c'est une surprise, sinon ça confirme que ta grammaire est stricte *)
-let _ = try show_ast "a := 0" with _ -> print_endline "Echec attendu: Espaces non gérés"
-
-(* Espaces entre les instructions *)
-let _ = try show_ast "a:=0; b:=1" with _ -> print_endline "Echec attendu: Espace après point-virgule"
-
-(* Variable inconnue 'z' *)
-(* Attention : À cause de p_skip = epsilon, ceci pourrait ne pas planter 
-   mais retourner juste 'Skip' et ignorer la chaine "z:=0", ou planter plus tard. *)
-let _ = show_ast "z:=0" 
-
-(* Valeur hors limites '9' *)
-let _ = show_ast "a:=9"
-
-(* Séquence longue *)
-(* Vérifie si tu obtiens Seq(Seq(Seq(...))) ou l'inverse *)
-let _ = show_ast "a:=0;b:=1;c:=0;d:=1"
-
-
-(*Exercice 2.1.3*)
-
-type bexp =
-  | Bnot of aexp
-  | Bconj of bexp * bexp
-  | Bdisj of bexp * bexp
-
-
-let p_final : (bexp, char) ranalist =
-  (terminal '!' -+> p_final ++> fun f -> epsilon_res (Bnot f))
-  +| ()
-
-
-(*Exercice 2.1.4*)
+(*Exercice 2.1.1 adapté au 2.1.4 optionel*)
 let rec p_blanc : char list -> char list = fun l ->
   match l with
   | ' ' :: rest | '\t' :: rest | '\n' :: rest -> p_blanc rest
@@ -314,18 +148,79 @@ fun l ->
       epsilon_res (While (cond, body))
   )))))))) l
 
+(*Exercice 2.1.2*)
+
+let string_of_aexp = function
+  | Aco n -> "Aco " ^ string_of_int n
+  | Ava n -> "Ava " ^ string_of_int n
+
+let rec string_of_instr = function
+  | Skip ->
+      "Skip"
+  | Assign (v, e) ->
+      "Assign (" ^ string_of_aexp v ^ ", " ^ string_of_aexp e ^ ")"
+  | Seq (i1, i2) ->
+      "Seq (" ^ string_of_instr i1 ^ ", " ^ string_of_instr i2 ^ ")"
+  | If (cond, i1, i2) ->
+      "If (" ^ string_of_aexp cond ^ ", "
+             ^ string_of_instr i1 ^ ", "
+             ^ string_of_instr i2 ^ ")"
+  | While (cond, body) ->
+      "While (" ^ string_of_aexp cond ^ ", "
+                ^ string_of_instr body ^ ")"
+
+let show_ast s =
+  let (ast, _) = p_prog (list_of_string s) in
+  print_endline (string_of_instr ast)
+
+let _ =show_ast "a:=0"
+let _=  show_ast "a:=0;b:=1"
+let _=  show_ast "w(a){a:=1}"
+let _=  show_ast "i(a){a:=0}{b:=1}"
+let _=  show_ast ";"
+let _= show_ast "a:=1;b:=1;c:=1;w(a){i(c){c:=0;a:=b}{b:=0;c:=a}}"
+let _ = show_ast "i(a){w(b){a:=1}}{b:=0}"
+let _ = show_ast "w(a){a:=0;b:=1;c:=0}"
+let _ = show_ast "i(a){w(b){i(c){a:=0}{a:=1}}}{d:=0}"
+let _ = show_ast "a:=0;b:=1;c:=0;d:=1"
+
+(* Bloc vide *)
+let _ = show_ast "w(a){}" 
+
+let _ = show_ast "a:=0;" (* Théorie : Seq(a:=0, Skip) *)
+let _ = show_ast "a:=0;;b:=1" (* Théorie : Devrait donner Seq((Assign, Skip), Assign *)
+
+
 (*Tests aspirateurs de blancs*)
-(* Si ça marche, c'est une surprise, sinon ça confirme que ta grammaire est stricte *)
 let _ = show_ast "a := 0"
-    
-(* Espaces entre les instructions *)
-let _ = show_ast "a:=0; b:=1"
-
-(* Espaces entre les instructions *)
 let _ = show_ast "a:=0;       b:=1"
-
-(* Espaces entre les instructions *)
 let _ = show_ast "a:=0; \n\n \t b:=1"
+let _ = show_ast "w     (  1) {  \t a:= 0  ; b := 1}"
+let _ = show_ast "i   (  b) {  \t a:= 0  ; b := 1}{ b:=0\n}"
+    
+
+(* Attention : On retrourne Skip lorsqu'on ne reconnait pas une instruction/variable (p_skip = epsilon) *)
+let _ = show_ast "z:=0" 
+(* Valeur hors limites '9' *)
+let _ = show_ast "a:=9"
+
+
+
+
+(*Exercice 2.1.3*)
+
+type bexp =
+  | Bnot of aexp
+  | Bconj of bexp * bexp
+  | Bdisj of bexp * bexp
+
+
+let p_final : (bexp, char) ranalist =
+  (terminal '!' -+> p_final ++> fun f -> epsilon_res (Bnot f))
+  +| ()
+
+
+
 
 
 
