@@ -231,43 +231,7 @@
   ignore (test_aexp "!!!!!!!!!!!!!!!!!!!!!!a");
   ignore (test_aexp "(a))");
   ignore (test_aexp "(a");
-
   ()
-
-
-  (*Exercice 2.1.3*)
-
-  let rec p_final : (aexp, char) ranalist =
-    fun l -> 
-      ( (terminal '!' -+> p_final ++> fun f -> epsilon_res (Bnot f))
-      +| (p_expr ++> fun e -> epsilon_res (e))
-      +| (terminal '(' -+> p_disj ++> fun d -> terminal ')' -+> epsilon_res d)
-      ) l
-  and p_disj : (aexp, char) ranalist =
-    fun l ->
-      (p_conj ++> fun c1 ->
-      p_disj_s c1
-      ) l
-  and p_disj_s (acc : aexp) : (aexp, char) ranalist =
-    fun l ->
-      ( (terminal '+' -+> p_conj ++> fun c2 ->
-          let c = Bdisj (acc, c2) in
-          p_disj_s c)
-        +|
-        epsilon_res (acc)
-      ) l
-  and p_conj : (aexp, char) ranalist =
-    fun l ->
-      ( p_final ++> fun f1 ->
-        p_conj_s f1 
-      ) l
-  and p_conj_s (acc : aexp) : (aexp, char) ranalist =
-    fun l -> 
-      ( ( terminal '.' -+> p_final ++> fun f2 ->
-      let acc' = Bconj (acc, f2) in
-      p_conj_s acc')
-      +| epsilon_res (acc)
-      ) l
     
   (*Exercice 2.2.1*)
 
