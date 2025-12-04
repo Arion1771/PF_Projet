@@ -227,44 +227,5 @@ let _ = show_ast "a:=9"
 let _ = show_ast "w   (!a) \t  {  \t a:= 0  ; b := 1}"
 let _ = show_ast "i    \t (!a.b+!c\n  )  {  \t a:= 0  ; b := 1}{ b:=0\n}"
 
-  (*TESTS : Expression avec disjonctions et conjonctions*)
-
-  let test_aexp s =
-  try
-    let (e, rest) = p_disj (list_of_string s) in
-    Printf.printf "=== Test expr : %S ===\n" s;
-    Printf.printf "AST  : %s\n" (string_of_aexp e);
-    Printf.printf "Reste: %S\n\n"
-      (String.of_seq (List.to_seq rest));
-    e
-  with Echec ->
-    Printf.printf "Échec de l'analyse d'expression sur : %S\n\n" s;
-    raise Echec
-   
-  let _ = string_of_aexp (Bdisj (
-   Bconj (Ava 0, Ava 1),
-   Aco 1
-))
-
-  let _ =
-  (* Expressions seules *)
-  ignore (test_aexp "a");
-  ignore (test_aexp "0");
-  ignore (test_aexp "a+b");
-  ignore (test_aexp "a.b");
-  ignore (test_aexp "a.b+1");
-  ignore (test_aexp "!a");
-  ignore (test_aexp "!a.b+0");
-  ignore (test_aexp "(a+b).c");
-  ignore (test_aexp "!(a+b).c");
-  ignore (test_aexp "!(a.b+!(c.d))");
-  ignore (test_aexp "!!a");
-  ignore (test_aexp "a+b.c+d.e");
-  ignore (test_aexp "((a))");
-  ignore (test_aexp "!!!!!!!!!!!!!!!!!!!!!!a");
-  ignore (test_aexp "(a))");
-  ignore (test_aexp "(a");
-  ()
-    
-  (*Exercice 2.2.1*)
+ 
 
