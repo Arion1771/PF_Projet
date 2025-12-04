@@ -57,10 +57,23 @@
 
   *)
 
-  (*Exercice 2.1.1*)
+(*Exercice 2.1.1 adapté au 2.1.4 optionel*)
+let rec p_blanc : char list -> char list = fun l ->
+  match l with
+  | ' ' :: rest | '\t' :: rest | '\n' :: rest -> p_blanc rest
+  | _ -> l
+
+let lexeme p = 
+  p_blanc -+> p ++> fun x ->
+  p_blanc -+> epsilon_res x
+
+let terminal_res_blanc f = lexeme (terminal_res f)
+
+let terminal_blanc c = 
+  p_blanc --> terminal c --> p_blanc
 
   let p_var : (aexp, char) ranalist = 
-    terminal_res (fun c -> match c with
+    terminal_res_blanc (fun c -> match c with
       | 'a' -> Some (Ava 0)
       | 'b' -> Some (Ava 1)
       | 'c' -> Some (Ava 2)
@@ -68,16 +81,16 @@
       |  _  -> None)
 
   let p_val : (aexp, char) ranalist = 
-    terminal_res (fun c -> match c with
+    terminal_res_blanc (fun c -> match c with
       | '0' -> Some (Aco 0)
       | '1' -> Some (Aco 1)
       |  _  -> None)
 
   let rec p_final : (aexp, char) ranalist =
     fun l -> 
-      ( (terminal '!' -+> p_final ++> fun f -> epsilon_res (Bnot f))
+      ( (terminal_blanc '!' -+> p_final ++> fun f -> epsilon_res (Bnot f))
       +| (p_expr ++> fun e -> epsilon_res (e))
-      +| (terminal '(' -+> p_disj ++> fun d -> terminal ')' -+> epsilon_res d)
+      +| (terminal_blanc '(' -+> p_disj ++> fun d -> terminal_blanc ')' -+> epsilon_res d)
       ) l
   and p_disj : (aexp, char) ranalist =
     fun l ->
@@ -86,7 +99,7 @@
       ) l
   and p_disj_s (acc : aexp) : (aexp, char) ranalist =
     fun l ->
-      ( (terminal '+' -+> p_conj ++> fun c2 ->
+      ( (terminal_blanc '+' -+> p_conj ++> fun c2 ->
           let c = Bdisj (acc, c2) in
           p_disj_s c)
         +|
@@ -99,7 +112,7 @@
       ) l
   and p_conj_s (acc : aexp) : (aexp, char) ranalist =
     fun l -> 
-      ( ( terminal '.' -+> p_final ++> fun f2 ->
+      ( ( terminal_blanc '.' -+> p_final ++> fun f2 ->
       let acc' = Bconj (acc, f2) in
       p_conj_s acc')
       +| epsilon_res (acc)
@@ -111,7 +124,7 @@
   and p_assign : (instr, char) ranalist =
     fun l ->
     ( p_var ++> fun i ->
-    terminal ':' -->
+    terminal_blanc ':' -->
     terminal '=' -+>
     (p_expr ++> fun e -> epsilon_res (Assign(i, e)))
     ) l
@@ -124,7 +137,7 @@
       p_prog_s i1) l
   and p_prog_s (acc : instr) : (instr, char) ranalist =
     fun l ->
-      ( (terminal ';' -+> p_instr ++> fun i2 ->
+      ( (terminal_blanc ';' -+> p_instr ++> fun i2 ->
           let acc' = Seq (acc, i2) in
           p_prog_s acc')
         +|
@@ -139,18 +152,18 @@
       ) l
   and p_if :(instr, char) ranalist =
     fun l ->
-      (terminal ('i') --> terminal ('(') -+> p_disj ++> fun cond -> terminal (')') -->
-      terminal ('{') -+> p_prog ++> fun i1 -> terminal ('}') -->
-      terminal ('{') -+> p_prog ++> fun i2 -> terminal ('}') -+>
+      (terminal_blanc ('i') --> terminal_blanc ('(') -+> p_disj ++> fun cond -> terminal_blanc (')') -->
+      terminal_blanc ('{') -+> p_prog ++> fun i1 -> terminal_blanc ('}') -->
+      terminal_blanc ('{') -+> p_prog ++> fun i2 -> terminal_blanc ('}') -+>
       epsilon_res (If (cond, i1, i2))) l
   and p_while : (instr, char) ranalist =
     fun l ->
-      ((terminal_res (fun c -> if c = 'w' then Some () else None)) ++>
-      (fun _ -> (terminal_res (fun c -> if c = '(' then Some () else None)) ++>
-      (fun _ -> p_disj ++>  (fun cond -> (terminal_res (fun c -> if c = ')' then Some () else None)) ++>
-      (fun _ -> (terminal_res (fun c -> if c = '{' then Some () else None)) ++>
+      ((terminal_res_blanc (fun c -> if c = 'w' then Some () else None)) ++>
+      (fun _ -> (terminal_res_blanc (fun c -> if c = '(' then Some () else None)) ++>
+      (fun _ -> p_disj ++>  (fun cond -> (terminal_res_blanc (fun c -> if c = ')' then Some () else None)) ++>
+      (fun _ -> (terminal_res_blanc (fun c -> if c = '{' then Some () else None)) ++>
       (fun _ -> p_prog ++>
-      (fun body -> (terminal_res (fun c -> if c = '}' then Some () else None)) ++>
+      (fun body -> (terminal_res_blanc (fun c -> if c = '}' then Some () else None)) ++>
       (fun _ -> epsilon_res (While (cond, body)))))))))
     ) l
   
@@ -192,8 +205,28 @@
   let _=  show_ast "i(a){a:=0}{b:=1}";;
   let _=  show_ast ";";;
   let _= show_ast "a:=1;b:=1;c:=1;w(a){i(c){c:=0;a:=b}{b:=0;c:=a}}";;
-  let _= show_ast "i(a+b){a:=1}{b:=0}";;
-  ()
+let _= show_ast "i(a+b){a:=1}{b:=0}";;
+
+(* Bloc vide *)
+let _ = show_ast "w(a){}" 
+let _ = show_ast "a:=0" 
+
+(*Tests aspirateurs de blancs*)
+let _ = show_ast "a := 0"
+let _ = show_ast "a:=0;       b:=1"
+let _ = show_ast "a:=0; \n\n \t b:=1"
+let _ = show_ast "w     (  1) {  \t a:= 0  ; b := 1}"
+let _ = show_ast "i   (  b) {  \t a:= 0  ; b := 1}{ b:=0\n}"
+    
+
+(* Attention : On retrourne Skip lorsqu'on ne reconnait pas une instruction/variable (p_skip = epsilon) *)
+let _ = show_ast "z:=0" 
+(* Valeur hors limites '9' *)
+let _ = show_ast "a:=9"
+
+let _ = show_ast "w   (!a) \t  {  \t a:= 0  ; b := 1}"
+let _ = show_ast "i    \t (!a.b+!c\n  )  {  \t a:= 0  ; b := 1}{ b:=0\n}"
+
   (*TESTS : Expression avec disjonctions et conjonctions*)
 
   let test_aexp s =
