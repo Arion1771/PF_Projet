@@ -226,7 +226,6 @@ let _ = show_ast "a:=9"
 
 let _ = show_ast "w   (!a) \t  {  \t a:= 0  ; b := 1}"
 let _ = show_ast "i    \t (!a.b+!c\n  )  {  \t a:= 0  ; b := 1}{ b:=0\n}"
-
  
 
 (*Exercice 2.2.1*)
@@ -379,7 +378,10 @@ let _ = run "a:=1; a:=0; a:=1" [0;0;0;0]
 let a_and_b = [1; 1; 0; 0] (* a=1, b=1 *)
 let _ = run "c:=0; i(a){ i(b){ c:=1 }{ c:=0 } }{ c:=0 }"  a_and_b
 (* État fin attendu : a=1; b=1; c=1; d=0 *)
-  
+let _ = run "c:=0; i(a.b){c:=1}{}" a_and_b    
+
+let a_or_b = [0; 0; 0; 0]
+let _ = run "c:=0; w(!(a+b)){c:=1; a:=1}" a_or_b            
 
 
 (* TESTS COMPLEXES / CAS LIMITES *)
