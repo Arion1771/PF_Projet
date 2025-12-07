@@ -353,3 +353,88 @@ let _ = run "w(a){a:=0}" s2;;
 
 (* 5) *)
 let _ =run "a:=1;b:=1;c:=1;w(a){i(c){c:=0;a:=b}{b:=0;c:=a}}" [0;0;0;0];;
+
+(* 6) Swap avec variable temporaire *)
+let swap = [1; 0; 0; 0]
+let _ = run "c:=a; a:=b; b:=c" swap
+(* Résultat attendu : a=0; b=1; c=1; d=0 *)
+
+
+(* 7) Test des constantes booléennes dans un IF *)
+let _ = run "i(1){a:=1}{a:=0}; i(0){b:=1}{b:=0}" [0;0;0;0]
+(* État fin : a=1; b=0; c=0; d=0 *)
+
+
+(* 8) While *)
+let _ = run "a:=1; w(a){ a:=0; b:=1 }" [0;0;0;0]
+(* État fin : a=0; b=1; c=0; d=0 *)
+
+
+(* 9) Ecrasement de variable *)
+let _ = run "a:=1; a:=0; a:=1" [0;0;0;0]
+(*  État fin attendu : a=1; b=0, c=0, d=0 *)
+
+
+(* 10) a AND b avec des if*)
+let a_and_b = [1; 1; 0; 0] (* a=1, b=1 *)
+let _ = run "c:=0; i(a){ i(b){ c:=1 }{ c:=0 } }{ c:=0 }"  a_and_b
+(* État fin attendu : a=1; b=1; c=1; d=0 *)
+  
+
+
+(* TESTS COMPLEXES / CAS LIMITES *)
+
+
+(* Test 11 : Blocs vides*)
+let _ = run "i(a){}{a:=1}" [0;0;0;0];;
+(* Résultat attendu : state = [1; 0; 0; 0] *)
+
+
+(* Test 12 : Blancs *)
+let code_blancs = "
+    a 
+    := 
+    1 
+    ; 
+    
+    w 
+    ( 
+       a 
+    ) 
+    { 
+       i(  a  )  
+       { 
+          a := 0 
+       } 
+       { 
+          b := 1 
+       } 
+    }
+"
+let _ = run code_blancs [0;0;0;0];;
+(* Résultat attendu : state = [0; 0; 0; 0] *)
+
+
+(* Test 13 : Imbrication profonde (While dans If dans While) *)
+let imbrication = "b:=1; w(b){ i(a){ a:=1 }{ i(b){ b:=0 }{ a:=1 } } }"
+let _ = run imbrication [0;0;0;0];;
+(* Résultat attendu : state = [0; 0; 0; 0] *)
+
+
+(* Test 14 : Le piège du Point-Virgule final *)
+let _ = run "a:=1;" [0;0;0;0];;
+(* Résultat attendu : state = [1; 0; 0; 0] *)
+
+
+(* Test 15 : Priorité d'exécution (Séquence vs While) *)
+let _ = run "a:=1; w(a){ a:=0 }; b:=1" [0;0;0;0];;
+(* Résultat attendu : state = [0; 1; 0; 0] *)
+
+
+(* Test 16 : Erreur de syntaxe volontaire (Valeur non gérée) *)
+let _ = 
+  try 
+    let _ = run "a:=2" [0;0;0;0] in 
+    print_endline "ECHEC : Le test doit échouer car p_val ne connait que 0 et 1"
+  with Failure msg -> 
+    Printf.printf "SUCCES : Erreur capturée correctement -> %s\n" msg
