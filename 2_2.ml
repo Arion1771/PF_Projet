@@ -207,3 +207,4 @@ let _ =
     print_endline "ECHEC : Le test doit échouer car p_val ne connait que 0 et 1"
   with Failure msg -> 
     Printf.printf "SUCCES : Erreur capturée correctement -> %s\n" msg
+  ;;

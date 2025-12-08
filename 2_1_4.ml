@@ -172,12 +172,15 @@ let terminal_blanc c =
   let _ =  run "1:=0";;
   let _ = run "z:=0";;
 
-  (*TESTS : Expression avec disjonctions et conjonctions*)
+  (*TESTS : Expression avec disjonctions et conjonctions ( fonctionnels )*)
   let _ = run "i(a+b){a:=1}{b:=0}";;
   let _ = run "i(a+b){a:=1}{b:=1}";;
   let _ = run "w(a.(!b)){a:=1}";;
-  let _ = run "i(a+b){a:=1}";; (*Parsing incomplet attendu*)
-  let _ = run "w(!a){b:=1}{a:=0}";; (*Parsing incomplet attendu*)
+
+  (*TESTS : Expression avec disjonctions et conjonctions ( non fonctionnels ) *)
+  let _ = run "i(a){a+b}{b:=0}";;
+  let _ = run "i(a+b){a:=1}";;
+  let _ = run "w(!a){b:=1}{a:=0}";;
 
   (*TESTS : Grammaire avec Blancs*)
   let _ = run "
