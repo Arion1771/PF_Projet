@@ -10,10 +10,10 @@ Contenu des fichiers
 - `2_1_2.ml` : premier parseur du langage sans opérateurs booléens complexes (if/while/assign/skip, variables `a`..`d` et valeurs 0/1) avec fonctions de rendu d'AST et jeux de tests basiques.
 - `2_1_3.ml` : parseur enrichi gérant disjonction/conjonction/négation booléenne via `+`, `.`, `!` et parenthèses ; mêmes tests adaptés.
 - `2_1_4.ml` : parseur tolérant les espaces/retours ligne/tabulations autour des lexèmes, avec tests incluant du code formaté sur plusieurs lignes.
-- `2_2.ml` : sémantique fonctionnelle (évaluation arith/booléenne, exécution d'instructions), fonction `run` pour exécuter un programme source sur un état initial, et une batterie de tests illustratifs.
-- `TD6Miaouriz.v` : TD Coq sur la sémantique naturelle du langage WHILE (états en listes de `nat`, fonctions `get/update`, dérivations et propriétés).
-- `TD7Makhy.v` : TD Coq sur la sémantique opérationnelle à petits pas (SOS) du même langage, avec définitions `config`, relation `SOS_1`, etc.
-- `README.md` : ce document.
+- `2_2_1.ml` : sémantique fonctionnelle, fonction `run` pour exécuter un programme source respectant la grammaire WHILEb-- sur un état initial, et une batterie de tests illustratifs.
+- `2_2_2.ml` : sémantique fonctionnelle, fonction `run` pour exécuter un programme source respectant la grammaire WHILEb sur un état initial, et une batterie de tests illustratifs.
+- `Preuves.v` : TD Coq sur la sémantique opérationnelle à petits pas (SOS) du même langage, avec définitions `config`, relation `SOS_1`, etc.
+
 
 Exécuter / tester le projet OCaml
 ----------------------------------
@@ -54,7 +54,7 @@ Travailler avec les TD Coq
 --------------------------
 - Compilation en ligne de commande :
 ```bash
-coqc Preuve.v
+coqc Preuves.v
 ```
 
 Questions traitées et répartition
