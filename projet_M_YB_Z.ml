@@ -264,10 +264,8 @@ let rec evalB (e : aexp) (s : state) : bool =
 
 let rec exec (i : instr) (s : state) : state =
   match i with
- 
   | Skip ->
       s
-
   | Assign (l, r) ->
       (match l with
        | Ava k ->
@@ -275,19 +273,13 @@ let rec exec (i : instr) (s : state) : state =
            update s k v
        | _ ->
            failwith "Assign: left-hand side must be a variable (Ava i)")
-
-
   | Seq (i1, i2) ->
       let s1 = exec i1 s in
       exec i2 s1
-
-
   | If (cond, i1, i2) ->
       if evalB cond s
       then exec i1 s
       else exec i2 s
-
-
   | While (cond, body) ->
       let rec loop s =
         if evalB cond s then
