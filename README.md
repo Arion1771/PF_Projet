@@ -19,13 +19,7 @@ Exécuter / tester le projet OCaml
 ----------------------------------
 Pré-requis : OCaml installé (toplevel `ocaml`). Pas de dépendance externe.
 
-1) Lancer tous les tests OCaml (parsing + exécution) :
-```bash
-ocaml 2_2.ml
-```
-Ce chargement `#use` automatiquement `anacomb.ml`, `partie_1.ml` et `2_1_4.ml`, construit l'interpréteur, puis exécute la suite de tests définie en fin de fichier (assignations, if/while, cas limites).
-
-2) Tester uniquement les parseurs :
+1) Tester uniquement les parseurs :
 ```bash
 ocaml 2_1_2.ml   # grammaire de base
 ocaml 2_1_3.ml   # grammaire avec + . !
@@ -33,9 +27,23 @@ ocaml 2_1_4.ml   # grammaire tolérant les blancs
 ```
 Chaque fichier affiche l'AST ou signale une erreur de parsing selon les cas de test inclus.
 
+2) Tester les parseurs avec les etats : 
+```bash
+ocaml 2_2_1.ml   # parseurs WHILEb-- avec etats
+ocaml 2_2_2.ml   # parseurs WHILEb avec etats
+```
+
 3) Exécuter votre propre programme :
 ```bash
-ocaml 2_2.ml
+ocaml 2_2_1.ml
+# tracez vos propres appels après chargement :
+let s0 = [0;0;0;0];;
+let _ = run "a:=1; w(a){ a:=0; b:=1 }" s0;;
+```
+`run <code> <etat_initial>` renvoie l'état final et affiche programme/AST/états. 
+
+```bash
+ocaml 2_2_2.ml
 # tracez vos propres appels après chargement :
 let s0 = [0;0;0;0];;
 let _ = run "a:=1; w(a){ a:=0; b:=1 }" s0;;
@@ -46,14 +54,21 @@ Travailler avec les TD Coq
 --------------------------
 - Compilation en ligne de commande :
 ```bash
-coqc TD6Miaouriz.v
-coqc TD7Makhy.v
+coqc Preuve.v
 ```
-- Ouverture interactive : `coqide TD6Miaouriz.v` / `coqide TD7Makhy.v`.
 
 Questions traitées et répartition
 ---------------------------------
-- Exercices OCaml : 1.1.x (définitions d'AST et grammaires), 2.1.x (parseurs successifs), 2.2.1 (sémantique fonctionnelle + interprète). Réalisé par l'équipe projet (OCaml).
-- TD6 Coq (sémantique naturelle) : fichier `TD6Miaouriz.v` — contribution Miaouriz.
-- TD7 Coq (SOS petit pas) : fichier `TD7Makhy.v` — contribution Makhy.
-
+- Exercices OCaml : 1.1.1 : Réalisé par Matthieu, Sami et Marie
+                    1.1.2 : Réalisé par Matthieu, Sami et Marie
+                    1.1.3 : Réalisé par Matthieu, Sami et Marie
+                    1.1.4 : Réalisé par Matthieu
+                    1.2.1 : Réalisé par Matthieu, Sami et Marie
+                    2.1.1 : Réalisé par Matthieu, Sami et Marie
+                    2.1.2 : Réalisé par Matthieu, Sami et Marie
+                    2.1.3 : Réalisé par Matthieu et Sami
+                    2.1.4 : Réalisé par Marie
+                    2.2.1 : Réalisé par Sami
+                    2.2.2 : Réalisé par Sami
+- Exercices Cocq : TD6 : Réalisé par Matthieu, Sami et Marie
+                   TD7 : Réalisé par Marie
