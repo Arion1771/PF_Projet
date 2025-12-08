@@ -160,8 +160,6 @@ let p_var : (aexp, char) ranalist =
   let _ = run "i(a+b){a:=1}{b:=0}";;
   let _ = run "i(a+b){a:=1}{b:=1}";;
   let _ = run "w(a.(!b)){a:=1}";;
-  let _ = run "i(a+b){a:=1}";;
-  let _ = run "w(!a){b:=1}{a:=0}";;
   let _ = run "i(a+1){a:=1}{b:=1}";;
   let _ = run "w(a.(!0)){a:=1}";;
 
@@ -169,3 +167,5 @@ let p_var : (aexp, char) ranalist =
   (*TESTS : Expression avec disjonctions et conjonctions ( non fonctionnels ) *)
   
   let _ = run "i(a){a+b}{b:=0}";;
+  let _ = run "i(a+b){a:=1}";;
+  let _ = run "w(!a){b:=1}{a:=0}";;
