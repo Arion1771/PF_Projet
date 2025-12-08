@@ -59,16 +59,16 @@ coqc Preuves.v
 
 Questions traitées et répartition
 ---------------------------------
-- Exercices OCaml : 1.1.1 : Réalisé par Matthieu, Sami et Marie
-                    1.1.2 : Réalisé par Matthieu, Sami et Marie
-                    1.1.3 : Réalisé par Matthieu, Sami et Marie
-                    1.1.4 : Réalisé par Matthieu
-                    1.2.1 : Réalisé par Matthieu, Sami et Marie
-                    2.1.1 : Réalisé par Matthieu, Sami et Marie
-                    2.1.2 : Réalisé par Matthieu, Sami et Marie
-                    2.1.3 : Réalisé par Matthieu et Sami
-                    2.1.4 : Réalisé par Marie
-                    2.2.1 : Réalisé par Sami
-                    2.2.2 : Réalisé par Sami
-- Exercices Cocq : TD6 : Réalisé par Matthieu, Sami et Marie
-                   TD7 : Réalisé par Marie
+- Exercices OCaml :- 1.1.1 : Réalisé par Matthieu, Sami et Marie
+                   - 1.1.2 : Réalisé par Matthieu, Sami et Marie
+                   - 1.1.3 : Réalisé par Matthieu, Sami et Marie
+                   - 1.1.4 : Réalisé par Matthieu et Sami
+                   - 1.2.1 : Réalisé par Matthieu, Sami et Marie
+                   - 2.1.1 : Réalisé par Matthieu, Sami et Marie
+                   - 2.1.2 : Réalisé par Matthieu, Sami et Marie
+                   - 2.1.3 : Réalisé par Matthieu et Sami
+                   - 2.1.4 : Réalisé par Marie
+                   - 2.2.1 : Réalisé par Sami
+                   - 2.2.2 : Réalisé par Sami
+- Exercices Cocq : - TD6 : Réalisé par Matthieu, Sami et Marie
+                   - TD7 : Réalisé par Marie
