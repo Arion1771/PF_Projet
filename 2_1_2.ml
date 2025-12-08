@@ -107,6 +107,7 @@ and p_while : (instr, char) ranalist =
   else
     Printf.printf "Programme : %S\n" code;
     Printf.printf "AST       : %s\n" (string_of_instr ast);
+  ;;
 
 
 

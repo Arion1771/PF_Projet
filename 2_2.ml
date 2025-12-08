@@ -98,6 +98,7 @@ let run (code : string) (s0 : state) : state =
     Printf.printf "Etat init : %s\n" (string_of_state s0);
     Printf.printf "Etat fin  : %s\n\n" (string_of_state sf);
     sf
+  ;;
 
 (* état initial : a=b=c=d=0 *)
 let s0 = [0; 0; 0; 0];;

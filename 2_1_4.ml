@@ -109,6 +109,7 @@ let terminal_blanc c =
       (fun body -> (terminal_res_blanc (fun c -> if c = '}' then Some () else None)) ++>
       (fun _ -> epsilon_res (While (cond, body)))))))))
     ) l
+  ;;
   
   let rec string_of_aexp = function
     | Aco n -> "Aco " ^ string_of_int n
@@ -119,6 +120,8 @@ let terminal_blanc c =
       "Bconj ( " ^ string_of_aexp e1 ^ ", " ^ string_of_aexp e2 ^ ")"
     | Bdisj (e1, e2) ->
       "Bdisj ( " ^ string_of_aexp e1 ^ ", " ^ string_of_aexp e2 ^ ")"
+  ;;
+
   let rec string_of_instr = function
     | Skip ->
         "Skip"
@@ -133,10 +136,12 @@ let terminal_blanc c =
     | While (cond, body) ->
         "While (" ^ string_of_aexp cond ^ ", "
                   ^ string_of_instr body ^ ")"
+  ;;
 
   let show_ast s =
     let (ast, _) = p_prog (list_of_string s) in
     print_endline (string_of_instr ast)
+  ;;
 
   let run (code : string) =
   let (ast, rest) = p_prog (list_of_string code) in
@@ -145,6 +150,7 @@ let terminal_blanc c =
   else
     Printf.printf "Programme : %S\n" code;
     Printf.printf "AST       : %s\n" (string_of_instr ast);
+  ;;
 
   (*TESTS : Grammaire basique ( fonctionnels )*)
   let _ = run "a:=0";;
@@ -196,7 +202,7 @@ let terminal_blanc c =
   ";;
 let _ = run "b:=1; w(b){ i(a){ a:=1 }{ i(b){ b:=0 }{ a:=1 } } }";;
 let _ = run "a:=1; w(a){ a:=0 }; b:=1";;
-let _ = run "w   (!a) \t  {  \t a:= 0  ; b := 1}"
-let _ = run "i    \t (!a.b+!c\n  )  {  \t a:= 0  ; b := 1}{ b:=0\n}"
+let _ = run "w   (!a) \t  {  \t a:= 0  ; b := 1}";;
+let _ = run "i    \t (!a.b+!c\n  )  {  \t a:= 0  ; b := 1}{ b:=0\n}";;
 
 

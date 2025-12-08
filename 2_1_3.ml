@@ -133,6 +133,7 @@ let p_var : (aexp, char) ranalist =
   else
     Printf.printf "Programme : %S\n" code;
     Printf.printf "AST       : %s\n" (string_of_instr ast);
+  ;;
 
   (*TESTS : Grammaire basique ( fonctionnels ) *)
 
