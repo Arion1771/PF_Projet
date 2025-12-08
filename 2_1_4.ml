@@ -150,10 +150,19 @@ let terminal_blanc c =
   let _ = run "a:=0";;
   let _=  run "a:=0;b:=1";;
   let _=  run "w(a){a:=1}";;
+  let _=  run "w(0){a:=1}";;
   let _=  run "i(a){a:=0}{b:=1}";;
   let _=  run ";";;
   let _=  run "a:=1;b:=1;c:=1;w(a){i(c){c:=0;a:=b}{b:=0;c:=a}}";;
-  ()
+
+  (*TESTS : Grammaire basique ( non fonctionnels ) *)
+  let _ = run "a:=2";;
+  let _ =  run "a:=0;b=1";;
+  let _ =  run "w(a:=1){a:=1}";;
+  let _ =  run "w(a){a:=0}{c:=0;a:=b}";;
+  let _ =  run "i(a){a:=0}";;
+  let _ =  run "i(a){a:=0}{b:=1}{c:=2}";;
+  let _ =  run "1:=0";;
 
   (*TESTS : Expression avec disjonctions et conjonctions*)
   let _ = run "i(a+b){a:=1}{b:=0}";;

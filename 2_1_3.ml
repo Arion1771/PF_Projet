@@ -96,8 +96,7 @@ let p_var : (aexp, char) ranalist =
       (fun _ -> epsilon_res (While (cond, body)))))))))
     ) l
 
-  (*Exercice 2.1.2*)
-
+  (*Fonctions de tests*)
   let rec string_of_aexp = function
     | Aco n -> "Aco " ^ string_of_int n
     | Ava n -> "Ava " ^ string_of_int n
@@ -135,21 +134,37 @@ let p_var : (aexp, char) ranalist =
     Printf.printf "Programme : %S\n" code;
     Printf.printf "AST       : %s\n" (string_of_instr ast);
 
-
-
-(*TESTS : Grammaire basique*)
+  (*TESTS : Grammaire basique ( fonctionnels ) *)
 
   let _ = run "a:=0";;
   let _=  run "a:=0;b:=1";;
   let _=  run "w(a){a:=1}";;
+  let _=  run "w(0){a:=1}";;
   let _=  run "i(a){a:=0}{b:=1}";;
   let _=  run ";";;
   let _=  run "a:=1;b:=1;c:=1;w(a){i(c){c:=0;a:=b}{b:=0;c:=a}}";;
-  ()
 
-  (*TESTS : Expression avec disjonctions et conjonctions*)
+  (*TESTS : Grammaire basique ( non fonctionnels ) *)
+
+  let _ = run "a:=2";;
+  let _ =  run "a:=0;b=1";;
+  let _ =  run "w(a:=1){a:=1}";;
+  let _ =  run "w(a){a:=0}{c:=0;a:=b}";;
+  let _ =  run "i(a){a:=0}";;
+  let _ =  run "i(a){a:=0}{b:=1}{c:=2}";;
+  let _ =  run "1:=0";;
+
+  (*TESTS : Expression avec disjonctions et conjonctions ( fonctionnels ) *)
+
   let _ = run "i(a+b){a:=1}{b:=0}";;
   let _ = run "i(a+b){a:=1}{b:=1}";;
   let _ = run "w(a.(!b)){a:=1}";;
   let _ = run "i(a+b){a:=1}";;
   let _ = run "w(!a){b:=1}{a:=0}";;
+  let _ = run "i(a+1){a:=1}{b:=1}";;
+  let _ = run "w(a.(!0)){a:=1}";;
+
+
+  (*TESTS : Expression avec disjonctions et conjonctions ( non fonctionnels ) *)
+  
+  let _ = run "i(a){a+b}{b:=0}";;
