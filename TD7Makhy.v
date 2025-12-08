@@ -178,6 +178,9 @@ Definition Pcarre n := While (Bnot (Beqnat Ir (Aco n))) corps_carre.
 (** Nouveau : on peut jouer avec des programmes qui bouclent *)
 Definition Pcarre_inf := While Btrue corps_carre.
 
+(* ======================= 3.1.2 DEBUT  ========================*)
+
+
 (* Question : Démontrer que Pcarre_2 mène d’un état avec i = 0, x = 0 et y = 1 à une configuration intermédiaire où Pcarre_2 peut être exécuté en partant d’un état avec i = 1, x = 1 et y = 3.*)
 Lemma SOS_Pcarre_2_1er_tour : SOS (Inter Pcarre_2 [0;0;1]) (Inter Pcarre_2 [1; 1; 3]).
 Proof.
@@ -191,6 +194,10 @@ Proof.
  
 
 (* Question : Indiquer ce que signifie l'énoncé et le démontrer *)
+(* Réponse : L'énoncé décrit l'exécution d'un seul tour de boucle pour le programme infini. Il signifie que si l'on part de la configuration où le programme est Pcarre_inf et l'état de la mémoire est [0; 0; 1], après un nombre fini de petits pas (correspondant à l'évaluation de la condition true et à l'exécution du corps de la boucle), on arrive à une nouvelle configuration où :
+   - Le programme est revenu au début de la boucle (Pcarre_inf).
+   - L'état de la mémoire est devenu [1; 1; 3] (les variables ont été incrémentées).*)
+
 Theorem SOS_Pcarre_inf_1er_tour : SOS (Inter Pcarre_inf [0;0;1]) (Inter Pcarre_inf [1; 1; 3]).
 Proof.
   eapply SOS_again. { apply SOS1_While. }
@@ -236,24 +243,59 @@ Qed.
 (** Propriété essentielle de SOS, qui a un intérêt pratique. *)
 Theorem SOS_trans : forall c1 c2 c3, SOS c1 c2 -> SOS c2 c3 -> SOS c1 c3.
 Proof.
-Admitted.
+  intros c1 c2 c3 H12 H23.
+  (* On fait une induction sur la preuve que c1 mène à c2 *)
+  induction H12.
+  - apply H23. 
+  - eapply SOS_again.
+    apply H.    
+    apply IHSOS.
+    apply H23.
+Qed.
 
 (* Question : Indiquer la signification du théorème SOS_Pcarre_2_2e_tour. *)
+(* Réponse : Ce lemme représente le deuxième tour de boucle du programme Pcarre_2 (qui s'arrête quand i=2).
+   - On part de l'état obtenu à la fin du 1er tour : [1; 1; 3] (donc i=1).
+   - Le programme vérifie la condition (i!=2, ce qui est Vrai), entre dans la boucle, et exécute les assignations.
+   -  On aboutit à l'état [2; 4; 5] (car i devient 1+1=2, x devient 1+3=4, y devient 3+2=5).*)
+
 (** Il n'est pas demandé de faire celui-ci
     (bien qu'un copié-collé d'un lemme précédent fonctionne). *)
 Lemma SOS_Pcarre_2_2e_tour : SOS (Inter Pcarre_2 [1; 1; 3]) (Inter Pcarre_2 [2; 4; 5]).
 Proof.
 Admitted.
 
+(* Question : Indiquer la signification du théorème SOS_Pcarre_2_fini et le démontrer.*)
+(* Réponse : Ce théorème représente la terminaison de la boucle While. Nous sommes dans l'état [2; 4; 5], ce qui signifie que la variable i vaut 2. La condition de la boucle Pcarre_2 est not (i = 2).
+   - Puisque i vaut 2, i = 2 est Vrai.
+   - Donc la condition not (i = 2) est Fausse.
+   - La boucle While se termine : elle n'exécute pas son corps et passe à l'instruction suivante (ou termine le programme).
+   - Le programme passe donc de l'état Inter à l'état Final sans modifier la mémoire. *)
 Theorem SOS_Pcarre_2_fini : SOS (Inter Pcarre_2 [2; 4; 5]) (Final [2; 4; 5]).
 Proof.
-Admitted.
+  eapply SOS_again. { apply SOS1_While. }
+  eapply SOS_again. 
+  { apply SOS1_If_false. simpl. reflexivity. }
+  eapply SOS_again. { apply SOS1_Skip. }
+  apply SOS_stop.
+Qed.
 
+(* Question : Démontrer que Pcarre_2 mène d’un état avec i = 0, x = 0 et y = 1 à une configuration finale d’état i = 2, x = 4 et y = 5. On pourra utiliser la transitivité de SOS.*)
 (** Même énoncé que SOS_Pcarre_2_V0. Utiliser SOS_trans *)
 Theorem SOS_Pcarre_2_fin_V1 : SOS (Inter Pcarre_2 [0;0;1]) (Final [2;4;5]).
 Proof.
-  apply SOS_trans with (Inter Pcarre_2 [1; 1; 3]).
-Admitted.
+   apply SOS_trans with (Inter Pcarre_2 [1; 1; 3]).
+    apply SOS_Pcarre_2_1er_tour. 
+   apply SOS_trans with (Inter Pcarre_2 [2; 4; 5]).
+    apply SOS_Pcarre_2_2e_tour.
+    apply SOS_Pcarre_2_fini.
+Qed.
+
+
+(* ======================= 3.1.2 FIN  ========================*)
+
+
+
 
 (** Généralisation à Pcarre *)
 
