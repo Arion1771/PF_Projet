@@ -146,7 +146,7 @@ let terminal_blanc c =
     Printf.printf "Programme : %S\n" code;
     Printf.printf "AST       : %s\n" (string_of_instr ast);
 
-  (*TESTS : Grammaire basique*)
+  (*TESTS : Grammaire basique ( fonctionnels )*)
   let _ = run "a:=0";;
   let _=  run "a:=0;b:=1";;
   let _=  run "w(a){a:=1}";;
@@ -154,6 +154,7 @@ let terminal_blanc c =
   let _=  run "i(a){a:=0}{b:=1}";;
   let _=  run ";";;
   let _=  run "a:=1;b:=1;c:=1;w(a){i(c){c:=0;a:=b}{b:=0;c:=a}}";;
+
 
   (*TESTS : Grammaire basique ( non fonctionnels ) *)
   let _ = run "a:=2";;
@@ -163,6 +164,7 @@ let terminal_blanc c =
   let _ =  run "i(a){a:=0}";;
   let _ =  run "i(a){a:=0}{b:=1}{c:=2}";;
   let _ =  run "1:=0";;
+  let _ = run "z:=0";;
 
   (*TESTS : Expression avec disjonctions et conjonctions*)
   let _ = run "i(a+b){a:=1}{b:=0}";;
@@ -194,3 +196,7 @@ let terminal_blanc c =
   ";;
 let _ = run "b:=1; w(b){ i(a){ a:=1 }{ i(b){ b:=0 }{ a:=1 } } }";;
 let _ = run "a:=1; w(a){ a:=0 }; b:=1";;
+let _ = run "w   (!a) \t  {  \t a:= 0  ; b := 1}"
+let _ = run "i    \t (!a.b+!c\n  )  {  \t a:= 0  ; b := 1}{ b:=0\n}"
+
+
